@@ -1,26 +1,10 @@
 class HTMLNode:
 
-    def __init__(self, **kwargs):
-        # tag init
-        if 'tag_str' in kwargs:                     # A string representing the HTML tag name (e.g. "p", "a", "h1", etc.)
-            HTMLNode.tag = kwargs['tag_str']
-        else:
-            HTMLNode.tag = None
-        # value init
-        if 'value_str' in kwargs:                   # A string representing the value of the HTML tag (e.g. the text inside a paragraph)
-            HTMLNode.value = kwargs['value_str']
-        else:
-            HTMLNode.value = None
-        # childre init
-        if 'children' in kwargs:
-            HTMLNode.children = kwargs['children']            # A list of HTMLNode objects representing the children of this node
-        else:
-            HTMLNode.children = None
-        # props init        
-        if 'props' in kwargs:
-            HTMLNode.props = kwargs['props']                  # A dictionary of key-value pairs representing the attributes of the HTML tag. For example, a link (<a> tag) might have {"href": "https://www.google.com"}
-        else:
-            HTMLNode.props = None
+    def __init__(self, tag_str=None, value_str=None, children=None, props=None):
+        self.tag = tag_str                              # A string representing the HTML tag name (e.g. "p", "a", "h1", etc.)
+        self.value = value_str                          # A string representing the value of the HTML tag (e.g. the text inside a paragraph)
+        self.children = children                        # A list of HTMLNode objects representing the children of this node
+        self.props = props if props is not None else {} # A dictionary of key-value pairs representing the attributes of the HTML tag. For example, a link (<a> tag) might have {"href": "https://www.google.com"}
 
     def to_html(self):
         raise NotImplementedError
@@ -31,7 +15,7 @@ class HTMLNode:
         props_str = ""
         for kw, value in self.props.items():
             props_str += " "
-            props_str += f"{kw}={value}"
+            props_str += f'''{kw}="{value}"'''
         return props_str
 
     def __repr__(self):
@@ -41,6 +25,17 @@ class HTMLNode:
         else:
             for child in self.children:
                 str=f"* Child: {child}\n"
-            str += self.props_to_html
+            str += self.props_to_html()
         return str
-        
+    
+class LeafNode(HTMLNode):                   # An HTMLNode with no children
+
+    def __init__(self, tag_str=None, value_str=None, props=None):
+        super().__init__(tag_str, value_str, None, props)
+
+    def to_html(self):
+        if self.value == None:
+            raise ValueError("All LeafNodes require a value")
+        if not self.tag:
+            return self.value
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
