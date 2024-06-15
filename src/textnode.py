@@ -20,6 +20,15 @@ def extract_markdown_links(text):
     matches = re.findall(pattern, text)
     return matches
 
+def markdown_to_blocks(markdown):
+    blocks = markdown.split("\n\n")
+    stripped_blocks = []
+    for block in blocks:
+        stripped = block.strip()
+        if stripped != "":
+            stripped_blocks.append(stripped)
+    return stripped_blocks
+
 def split_nodes_images(old_nodes):
     new_nodes = []
     for old_node in old_nodes:

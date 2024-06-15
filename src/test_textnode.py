@@ -8,8 +8,29 @@ from textnode import(
     extract_markdown_links,
     split_nodes_images,
     split_nodes_links,
-    text_to_textnodes
+    text_to_textnodes,
+    markdown_to_blocks
 )
+
+class TestMarkdownToBlocks(unittest.TestCase):
+    def test_markdown_to_blocks(self):
+        markdown = """This is **bolded** paragraph
+
+This is another paragraph with *italic* text and `code` here
+This is the same paragraph on a new line
+
+* This is a list
+* with items"""
+        expected_block_a = "This is **bolded** paragraph"
+        expected_block_b = """This is another paragraph with *italic* text and `code` here
+This is the same paragraph on a new line"""
+        expected_block_c = """* This is a list
+* with items"""
+        blocks = markdown_to_blocks(markdown)
+        self.assertEqual(len(blocks), 3)
+        self.assertEqual(blocks[0], expected_block_a)
+        self.assertEqual(blocks[1], expected_block_b)
+        self.assertEqual(blocks[2], expected_block_c)
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
