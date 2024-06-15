@@ -10,6 +10,29 @@ class TextType(Enum):
     LINK = "link"
     IMAGE = "image"
 
+class BlockType(Enum):
+    PARA = "paragraph"
+    HEAD = "heading"
+    CODE = "code"
+    QUOTE = "quote"
+    UL = "unordered_list"
+    OL = "ordered list"
+
+def block_to_block_type(markdown):
+    block = block.strip()
+    if is_heading(block):
+        return BlockType.PARA
+    elif is_code_block(block):
+        return BlockType.CODE
+    elif is_quote_block(block):
+        return BlockType.QUOTE
+    elif is_unordered_list(block):
+        return BlockType.UL
+    elif is_ordered_list(block):
+        return BlockType.OL
+    else:
+        return BlockType.PARA
+
 def extract_markdown_images(text):
     pattern = r"!\[(.*?)\]\((.*?)\)"
     matches = re.findall(pattern, text)
@@ -19,6 +42,25 @@ def extract_markdown_links(text):
     pattern = r"(?<!\!)\[(.*?)\]\((.*?)\)"
     matches = re.findall(pattern, text)
     return matches
+
+def is_heading(block):
+    return bool(re.match(r'^#{1,6} ', block))
+
+def is_code_block(block):
+    return block.startswith('```') and block.endswith('```')
+
+def is_quote_block(block):
+    return all(line.startswith('>') for line in block.split('\n'))
+
+def is_unordered_list(block):
+    return all(re.match(r'^[*-] ', line) for line in block.split('\n'))
+
+def is_ordered_list(block):
+    lines = block.split('\n')
+    for i, line in enumerate(lines, start=1):
+        if not re.match(r'^{i}\. '.format(i=i), line):
+            return False
+    return True
 
 def markdown_to_blocks(markdown):
     blocks = markdown.split("\n\n")
@@ -38,10 +80,7 @@ def split_nodes_images(old_nodes):
                 text_to_split = old_node.text
                 for image_tup in image_tups:
                     segments = text_to_split.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
-                    print(new_nodes)
-                    print(image_tup)
                     new_nodes.append(TextNode(segments[0], old_node.text_type))
-                    print(new_nodes)
                     new_nodes.append(TextNode(image_tup[0], TextType.IMAGE, image_tup[1]))
                     if len(segments) > 1 and segments[1] != "":
                         text_to_split = segments[1]

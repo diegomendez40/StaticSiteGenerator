@@ -9,7 +9,12 @@ from textnode import(
     split_nodes_images,
     split_nodes_links,
     text_to_textnodes,
-    markdown_to_blocks
+    markdown_to_blocks,
+    is_heading,
+    is_code_block,
+    is_quote_block,
+    is_unordered_list,
+    is_ordered_list
 )
 
 class TestMarkdownToBlocks(unittest.TestCase):
@@ -31,6 +36,52 @@ This is the same paragraph on a new line"""
         self.assertEqual(blocks[0], expected_block_a)
         self.assertEqual(blocks[1], expected_block_b)
         self.assertEqual(blocks[2], expected_block_c)
+
+    def test_block_to_block_type(self):
+        # Define different blocks of Markdown
+        test_cases = {
+            "Heading 1": "# Heading 1",
+            "Heading 2": "## Heading 2",
+            "Code block": "```\nCode block\n```",
+            "Quote block": "> Quote block\n> with multiple lines",
+            "Unordered list": "* Item 1\n* Item 2",
+            "Ordered list": "1. Item 1\n2. Item 2",
+            "Paragraph": "This is a normal paragraph.",
+            "Mixed content": "# Heading\n\nThis is a paragraph.\n\n```\nCode block\n```"
+        }
+
+        # Expected results
+        expected_results = {
+            "Heading 1": "Heading: # Heading 1",
+            "Heading 2": "Heading: ## Heading 2",
+            "Code block": "Code block: ```\nCode block\n```",
+            "Quote block": "Quote block: > Quote block\n> with multiple lines",
+            "Unordered list": "Unordered list: * Item 1\n* Item 2",
+            "Ordered list": "Ordered list: 1. Item 1\n2. Item 2",
+            "Paragraph": "Paragraph: This is a normal paragraph.",
+            "Mixed content": "Heading: # Heading\n\nParagraph: This is a paragraph.\n\nCode block: ```\nCode block\n```"
+        }
+        
+        for name, markdown in test_cases.items():
+            with self.subTest(name=name):
+                blocks = markdown.split('\n\n')
+                result = []
+                for block in blocks:
+                    block = block.strip()
+                    if is_heading(block):
+                        result.append(f"Heading: {block}")
+                    elif is_code_block(block):
+                        result.append(f"Code block: {block}")
+                    elif is_quote_block(block):
+                        result.append(f"Quote block: {block}")
+                    elif is_unordered_list(block):
+                        result.append(f"Unordered list: {block}")
+                    elif is_ordered_list(block):
+                        result.append(f"Ordered list: {block}")
+                    else:
+                        result.append(f"Paragraph: {block}")
+                
+                self.assertEqual('\n\n'.join(result), expected_results[name])
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
