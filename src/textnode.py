@@ -16,7 +16,7 @@ def extract_markdown_images(text):
     return matches
 
 def extract_markdown_links(text):
-    pattern = r"\[(.*?)\]\((.*?)\)"
+    pattern = r"(?<!\!)\[(.*?)\]\((.*?)\)"
     matches = re.findall(pattern, text)
     return matches
 
@@ -29,14 +29,17 @@ def split_nodes_images(old_nodes):
                 text_to_split = old_node.text
                 for image_tup in image_tups:
                     segments = text_to_split.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
+                    print(new_nodes)
+                    print(image_tup)
                     new_nodes.append(TextNode(segments[0], old_node.text_type))
+                    print(new_nodes)
                     new_nodes.append(TextNode(image_tup[0], TextType.IMAGE, image_tup[1]))
                     if len(segments) > 1 and segments[1] != "":
                         text_to_split = segments[1]
                 if len(segments) > 1 and segments[1] != "":
                     new_nodes.append(TextNode(segments[1], old_node.text_type))
             else:
-                new_nodes.append(TextNode(old_node.text, old_node.text_type))
+                new_nodes.append(TextNode(old_node.text, old_node.text_type, old_node.url))
     return new_nodes
 
 def split_nodes_links(old_nodes):
@@ -55,7 +58,7 @@ def split_nodes_links(old_nodes):
                 if len(segments) > 1 and segments[1] != "":
                     new_nodes.append(TextNode(segments[1], old_node.text_type))
             else:
-                new_nodes.append(TextNode(old_node.text, old_node.text_type))
+                new_nodes.append(TextNode(old_node.text, old_node.text_type, old_node.url))
     return new_nodes
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
@@ -88,6 +91,16 @@ def text_node_to_html_node(text_node):
         case TextType.IMAGE:
             return LeafNode("img", "", {"src":text_node.url, "alt":text_node.text})
     raise Exception("Unsupported TextNode type")
+
+def text_to_textnodes(text):
+    nodes = [TextNode(text, TextType.TEXT)]
+    nodes = split_nodes_delimiter(nodes, '**', TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, '*', TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, '`', TextType.CODE)
+    # import pdb; pdb.set_trace()
+    nodes = split_nodes_images(nodes)
+    nodes = split_nodes_links(nodes)
+    return nodes
 
 class TextNode:
 
