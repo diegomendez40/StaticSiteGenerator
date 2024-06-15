@@ -1,6 +1,14 @@
 import unittest
 
-from textnode import TextNode, TextType, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from textnode import(
+    TextNode,
+    TextType,
+    split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links,
+    split_nodes_images,
+    split_nodes_links
+)
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -99,6 +107,55 @@ class TestMarkdownExtraction(unittest.TestCase):
         expected = [("first", "http://first.com"), ("second", "http://second.com")]
         self.assertEqual(extract_markdown_links(text), expected)
 
+class TestSplitNodes(unittest.TestCase):
+
+    def test_split_nodes_images(self):
+        # Test with a single image
+        old_nodes = [TextNode("This is an image ![alt text](image.jpg)", TextType.TEXT)]
+        expected = [
+            TextNode("This is an image ", TextType.TEXT),
+            TextNode("alt text", TextType.IMAGE, "image.jpg"),
+        ]
+        self.assertEqual(split_nodes_images(old_nodes), expected)
+
+        # Test with multiple images
+        old_nodes = [TextNode("First ![first](first.jpg) second ![second](second.png)", TextType.TEXT)]
+        expected = [
+            TextNode("First ", TextType.TEXT),
+            TextNode("first", TextType.IMAGE, "first.jpg"),
+            TextNode(" second ", TextType.TEXT),
+            TextNode("second", TextType.IMAGE, "second.png"),
+        ]
+        self.assertEqual(split_nodes_images(old_nodes), expected)
+
+        # Test with no images
+        old_nodes = [TextNode("This text has no images.", TextType.TEXT)]
+        expected = [TextNode("This text has no images.", TextType.TEXT)]
+        self.assertEqual(split_nodes_images(old_nodes), expected)
+
+    def test_split_nodes_links(self):
+        # Test with a single link
+        old_nodes = [TextNode("This is a link [link text](http://example.com)", TextType.TEXT)]
+        expected = [
+            TextNode("This is a link ", TextType.TEXT),
+            TextNode("link text", TextType.LINK, "http://example.com"),
+        ]
+        self.assertEqual(split_nodes_links(old_nodes), expected)
+
+        # Test with multiple links
+        old_nodes = [TextNode("First [first](http://first.com) second [second](http://second.com)", TextType.TEXT)]
+        expected = [
+            TextNode("First ", TextType.TEXT),
+            TextNode("first", TextType.LINK, "http://first.com"),
+            TextNode(" second ", TextType.TEXT),
+            TextNode("second", TextType.LINK, "http://second.com"),
+        ]
+        self.assertEqual(split_nodes_links(old_nodes), expected)
+
+        # Test with no links
+        old_nodes = [TextNode("This text has no links.", TextType.TEXT)]
+        expected = [TextNode("This text has no links.", TextType.TEXT)]
+        self.assertEqual(split_nodes_links(old_nodes), expected)
 
 if __name__ == "__main__":
     unittest.main()
