@@ -1,4 +1,8 @@
-from textnode import text_to_textnodes
+from textnode import (
+    text_to_textnodes,
+    textnode_to_html_node
+)
+from enum import Enum
 import re
 
 class BlockType(Enum):
@@ -100,3 +104,8 @@ class MDBlock:      # Markdown Block
         clean_block = mdstrip(block, self.type)
         self.nodes = text_to_textnodes(clean_block)
         
+    def to_html_node():
+        str = '<p>'
+        for node in self.nodes:
+           str += textnode_to_html_node(node) 
+        return str

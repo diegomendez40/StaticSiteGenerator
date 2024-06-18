@@ -10,29 +10,6 @@ class TextType(Enum):
     LINK = "link"
     IMAGE = "image"
 
-class BlockType(Enum):
-    PARA = "paragraph"
-    HEAD = "heading"
-    CODE = "code"
-    QUOTE = "quote"
-    UL = "unordered_list"
-    OL = "ordered list"
-
-def block_to_block_type(markdown):
-    block = block.strip()
-    if is_heading(block):
-        return BlockType.PARA
-    elif is_code_block(block):
-        return BlockType.CODE
-    elif is_quote_block(block):
-        return BlockType.QUOTE
-    elif is_unordered_list(block):
-        return BlockType.UL
-    elif is_ordered_list(block):
-        return BlockType.OL
-    else:
-        return BlockType.PARA
-
 def extract_markdown_images(text):
     pattern = r"!\[(.*?)\]\((.*?)\)"
     matches = re.findall(pattern, text)
@@ -42,34 +19,6 @@ def extract_markdown_links(text):
     pattern = r"(?<!\!)\[(.*?)\]\((.*?)\)"
     matches = re.findall(pattern, text)
     return matches
-
-def is_heading(block):
-    return bool(re.match(r'^#{1,6} ', block))
-
-def is_code_block(block):
-    return block.startswith('```') and block.endswith('```')
-
-def is_quote_block(block):
-    return all(line.startswith('>') for line in block.split('\n'))
-
-def is_unordered_list(block):
-    return all(re.match(r'^[*-] ', line) for line in block.split('\n'))
-
-def is_ordered_list(block):
-    lines = block.split('\n')
-    for i, line in enumerate(lines, start=1):
-        if not re.match(r'^{i}\. '.format(i=i), line):
-            return False
-    return True
-
-def markdown_to_blocks(markdown):
-    blocks = markdown.split("\n\n")
-    stripped_blocks = []
-    for block in blocks:
-        stripped = block.strip()
-        if stripped != "":
-            stripped_blocks.append(stripped)
-    return stripped_blocks
 
 def split_nodes_images(old_nodes):
     new_nodes = []
@@ -124,7 +73,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                         new_nodes.append(TextNode(segment, text_type))
         return new_nodes
 
-def text_node_to_html_node(text_node):
+def textnode_to_html_node(text_node):
     match text_node.text_type:
         case TextType.TEXT:
             return LeafNode(None, text_node.text)
