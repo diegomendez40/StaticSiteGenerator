@@ -74,5 +74,26 @@ class TestParentNode(unittest.TestCase):
         html = '''<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>'''
         self.assertEqual(f"{node.to_html()}", html)
 
+    def test_to_html4(self):
+        node = ParentNode(
+            "div",
+            [
+                ParentNode("p", [
+                    LeafNode(None, "This is "),
+                    LeafNode("b", "bolded"),
+                    LeafNode(None, " paragraph text in a p tag here")
+                ]),
+                ParentNode("p", [
+                    LeafNode(None, "This is another paragraph with "),
+                    LeafNode("i", "italic"),
+                    LeafNode(None, " text and "),
+                    LeafNode("code", "code"),
+                    LeafNode(None, " here")
+                ])
+            ],
+        )
+        html = "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>"
+        self.assertEqual(f"{node.to_html()}", html)
+
 if __name__ == "__main__":
     unittest.main()

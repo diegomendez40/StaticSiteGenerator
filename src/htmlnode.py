@@ -18,6 +18,12 @@ class HTMLNode:
             props_str += f'''{kw}="{value}"'''
         return props_str
 
+    def __eq__(self, node):
+        cond1 = self.tag == node.tag
+        cond2 = self.value == node.value
+        cond3 = self.children == node.children
+        return (cond1 and cond2 and cond3)
+
     def __repr__(self):
         str = f"Tag:{self.tag}, Value:{self.value}\n"
         if self.children == None:
@@ -52,6 +58,11 @@ class ParentNode(HTMLNode):                  # An HTMLNode with children
             raise ValueError("All ParentNodes require children")
         html = f"<{self.tag}>"
         for node in self.children:
+            if html.startswith("<div><p>This is <b>bolded</b> paragraph\n"):
+                import pdb; pdb.set_trace()
+            print(html)
+            print(node)
             html += node.to_html()
+            print(html)
         html += f"</{self.tag}>"
         return html

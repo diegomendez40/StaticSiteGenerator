@@ -74,19 +74,21 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         return new_nodes
 
 def textnode_to_html_node(text_node):
+    # Eliminamos \n porque equivale a espacio en html
+    unbroken_text = text_node.text.replace('\n', ' ')
     match text_node.text_type:
         case TextType.TEXT:
-            return LeafNode(None, text_node.text)
+            return LeafNode(None, unbroken_text)
         case TextType.BOLD:
-            return LeafNode("b", text_node.text)
+            return LeafNode("b", unbroken_text)
         case TextType.ITALIC:
-            return LeafNode("i", text_node.text)
+            return LeafNode("i", unbroken_text)
         case TextType.CODE:
-            return LeafNode("code", text_node.text)
+            return LeafNode("code", unbroken_text)
         case TextType.LINK:
-            return LeafNode("a", text_node.text, {"href":text_node.url})
+            return LeafNode("a", unbroken_text, {"href":text_node.url})
         case TextType.IMAGE:
-            return LeafNode("img", "", {"src":text_node.url, "alt":text_node.text})
+            return LeafNode("img", "", {"src":text_node.url, "alt":unbroken_text})
     raise Exception("Unsupported TextNode type")
 
 def text_to_textnodes(text):
