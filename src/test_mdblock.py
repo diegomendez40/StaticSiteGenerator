@@ -2,18 +2,19 @@ import unittest
 
 from mdblock import (
     BlockType,
-    MDBlock,
+    MDFlatBlock,
     block_to_block_type,
     markdown_to_blocks,
     markdown_to_html_node
 )
 
+
 class TestMDBlock(unittest.TestCase):
 
     def test_to_html_node(self):
         str = "This is just a test"
-        md1 = MDBlock(str)
-        md2 = MDBlock(str)
+        md1 = MDFlatBlock(str)
+        md2 = MDFlatBlock(str)
         html_node_1 = md1.to_html_node()
         html_node_2 = md2.to_html_node()
         self.assertEqual(md1, md2)
@@ -21,12 +22,13 @@ class TestMDBlock(unittest.TestCase):
 
     def test_to_html_node1(self):
         str = "<b>This</b> is just a <i>test</i>"
-        md1 = MDBlock(str)
-        md2 = MDBlock(str)
+        md1 = MDFlatBlock(str)
+        md2 = MDFlatBlock(str)
         html_node_1 = md1.to_html_node()
         html_node_2 = md2.to_html_node()
         self.assertEqual(md1, md2)
         self.assertEqual(html_node_1, html_node_2)
+
 
 class TestMarkdownToHTML(unittest.TestCase):
     def test_markdown_to_blocks(self):

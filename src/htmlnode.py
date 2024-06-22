@@ -58,11 +58,6 @@ class ParentNode(HTMLNode):                  # An HTMLNode with children
             raise ValueError("All ParentNodes require children")
         html = f"<{self.tag}>"
         for node in self.children:
-            if html.startswith("<div><p>This is <b>bolded</b> paragraph\n"):
-                import pdb; pdb.set_trace()
-            print(html)
-            print(node)
             html += node.to_html()
-            print(html)
         html += f"</{self.tag}>"
         return html

@@ -2,6 +2,7 @@ from htmlnode import LeafNode
 from enum import Enum
 import re
 
+
 class TextType(Enum):
     TEXT = "text"
     BOLD = "bold"
@@ -10,15 +11,18 @@ class TextType(Enum):
     LINK = "link"
     IMAGE = "image"
 
+
 def extract_markdown_images(text):
     pattern = r"!\[(.*?)\]\((.*?)\)"
     matches = re.findall(pattern, text)
     return matches
 
+
 def extract_markdown_links(text):
     pattern = r"(?<!\!)\[(.*?)\]\((.*?)\)"
     matches = re.findall(pattern, text)
     return matches
+
 
 def split_nodes_images(old_nodes):
     new_nodes = []
@@ -39,6 +43,7 @@ def split_nodes_images(old_nodes):
                 new_nodes.append(TextNode(old_node.text, old_node.text_type, old_node.url))
     return new_nodes
 
+
 def split_nodes_links(old_nodes):
     new_nodes = []
     for old_node in old_nodes:
@@ -58,20 +63,22 @@ def split_nodes_links(old_nodes):
                 new_nodes.append(TextNode(old_node.text, old_node.text_type, old_node.url))
     return new_nodes
 
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
-        # import pdb; pdb.set_trace()
-        new_nodes = []
-        for old_node in old_nodes:
-            if old_node.text_type != TextType.TEXT:
-                new_nodes.append(old_node)
-            else:
-                segments = old_node.text.split(delimiter)
-                for i, segment in enumerate(segments):
-                    if i % 2 == 0:
-                        new_nodes.append(TextNode(segment, old_node.text_type))
-                    else:
-                        new_nodes.append(TextNode(segment, text_type))
-        return new_nodes
+    # import pdb; pdb.set_trace()
+    new_nodes = []
+    for old_node in old_nodes:
+        if old_node.text_type != TextType.TEXT:
+            new_nodes.append(old_node)
+        else:
+            segments = old_node.text.split(delimiter)
+            for i, segment in enumerate(segments):
+                if i % 2 == 0:
+                    new_nodes.append(TextNode(segment, old_node.text_type))
+                else:
+                    new_nodes.append(TextNode(segment, text_type))
+    return new_nodes
+
 
 def textnode_to_html_node(text_node):
     # Eliminamos \n porque equivale a espacio en html
@@ -86,10 +93,11 @@ def textnode_to_html_node(text_node):
         case TextType.CODE:
             return LeafNode("code", unbroken_text)
         case TextType.LINK:
-            return LeafNode("a", unbroken_text, {"href":text_node.url})
+            return LeafNode("a", unbroken_text, {"href": text_node.url})
         case TextType.IMAGE:
-            return LeafNode("img", "", {"src":text_node.url, "alt":unbroken_text})
+            return LeafNode("img", "", {"src": text_node.url, "alt": unbroken_text})
     raise Exception("Unsupported TextNode type")
+
 
 def text_to_textnodes(text):
     nodes = [TextNode(text, TextType.TEXT)]
@@ -100,6 +108,7 @@ def text_to_textnodes(text):
     nodes = split_nodes_images(nodes)
     nodes = split_nodes_links(nodes)
     return nodes
+
 
 class TextNode:
 
@@ -113,6 +122,6 @@ class TextNode:
         cond2 = self.text_type == node.text_type
         cond3 = self.url == node.url
         return (cond1 and cond2 and cond3)
-    
+
     def __repr__(self):
         return f"TextNode({self.text}, {self.text_type}, {self.url})"

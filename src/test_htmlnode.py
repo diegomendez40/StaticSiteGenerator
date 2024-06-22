@@ -4,12 +4,14 @@ from htmlnode import HTMLNode
 from htmlnode import LeafNode
 from htmlnode import ParentNode
 
+
 class TestHTMLNode(unittest.TestCase):
 
     def test_props(self):
         node = HTMLNode("a", "Este es el texto", props={"href": "https://www.google.com"})
         node2 = HTMLNode("a", "Este es el texto", props={"href": "https://www.google.com"})
         self.assertEqual(f"{node}", f"{node2}")
+
 
 class TestLeafNode(unittest.TestCase):
 
@@ -27,6 +29,7 @@ class TestLeafNode(unittest.TestCase):
         node = LeafNode("a", "Click me!", {"href": "https://www.google.com"})
         html = '''<a href="https://www.google.com">Click me!</a>'''
         self.assertEqual(f"{node.to_html()}", html)
+
 
 class TestParentNode(unittest.TestCase):
 
@@ -94,6 +97,7 @@ class TestParentNode(unittest.TestCase):
         )
         html = "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>"
         self.assertEqual(f"{node.to_html()}", html)
+
 
 if __name__ == "__main__":
     unittest.main()

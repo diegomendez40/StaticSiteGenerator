@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import(
+from textnode import (
     TextNode,
     TextType,
     split_nodes_delimiter,
@@ -19,6 +19,7 @@ from mdblock import (
     is_unordered_list,
     is_ordered_list
 )
+
 
 class TestMarkdownToBlocks(unittest.TestCase):
     def test_markdown_to_blocks(self):
@@ -64,7 +65,7 @@ This is the same paragraph on a new line"""
             "Paragraph": "Paragraph: This is a normal paragraph.",
             "Mixed content": "Heading: # Heading\n\nParagraph: This is a paragraph.\n\nCode block: ```\nCode block\n```"
         }
-        
+
         for name, markdown in test_cases.items():
             with self.subTest(name=name):
                 blocks = markdown.split('\n\n')
@@ -83,20 +84,21 @@ This is the same paragraph on a new line"""
                         result.append(f"Ordered list: {block}")
                     else:
                         result.append(f"Paragraph: {block}")
-                
+
                 self.assertEqual('\n\n'.join(result), expected_results[name])
+
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
         node = TextNode("This is a text node", "bold", "url1")
         node2 = TextNode("This is a text node", "bold", "url1")
         self.assertEqual(node, node2)
-    
+
     def test_split_nodes_bold(self):
         node = TextNode("This is text with a **bold** word", TextType.TEXT)
         new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
         print(new_nodes)
-        
+
         self.assertEqual(len(new_nodes), 3)
         self.assertEqual(new_nodes[0].text, "This is text with a ")
         self.assertEqual(new_nodes[0].text_type, TextType.TEXT)
@@ -108,7 +110,7 @@ class TestTextNode(unittest.TestCase):
     def test_split_nodes_italic(self):
         node = TextNode("This is *italic* text", TextType.TEXT)
         new_nodes = split_nodes_delimiter([node], "*", TextType.ITALIC)
-        
+
         self.assertEqual(len(new_nodes), 3)
         self.assertEqual(new_nodes[0].text, "This is ")
         self.assertEqual(new_nodes[0].text_type, TextType.TEXT)
@@ -120,7 +122,7 @@ class TestTextNode(unittest.TestCase):
     def test_split_nodes_code(self):
         node = TextNode("This is `code` text", TextType.TEXT)
         new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
-        
+
         self.assertEqual(len(new_nodes), 3)
         self.assertEqual(new_nodes[0].text, "This is ")
         self.assertEqual(new_nodes[0].text_type, TextType.TEXT)
@@ -128,6 +130,7 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(new_nodes[1].text_type, TextType.CODE)
         self.assertEqual(new_nodes[2].text, " text")
         self.assertEqual(new_nodes[2].text_type, TextType.TEXT)
+
 
 class TestMarkdownExtraction(unittest.TestCase):
 
@@ -183,6 +186,7 @@ class TestMarkdownExtraction(unittest.TestCase):
         expected = [("first", "http://first.com"), ("second", "http://second.com")]
         self.assertEqual(extract_markdown_links(text), expected)
 
+
 class TestSplitNodes(unittest.TestCase):
 
     def test_split_nodes_images(self):
@@ -233,6 +237,7 @@ class TestSplitNodes(unittest.TestCase):
         expected = [TextNode("This text has no links.", TextType.TEXT)]
         self.assertEqual(split_nodes_links(old_nodes), expected)
 
+
 class TestTextToTextNodes(unittest.TestCase):
 
     def test_text_to_textnodes(self):
@@ -246,11 +251,13 @@ class TestTextToTextNodes(unittest.TestCase):
             TextNode(" word and a ", TextType.TEXT),
             TextNode("code block", TextType.CODE),
             TextNode(" and an ", TextType.TEXT),
-            TextNode("image", TextType.IMAGE, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode("image", TextType.IMAGE,
+                     "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
             TextNode(" and a ", TextType.TEXT),
             TextNode("link", TextType.LINK, "https://boot.dev"),
         ]
         self.assertEqual(actual_nodes, expected)
+
 
 if __name__ == "__main__":
     unittest.main()
