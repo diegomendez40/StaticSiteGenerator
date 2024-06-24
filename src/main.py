@@ -1,6 +1,7 @@
 import os
 import shutil
 from textnode import TextNode
+from mdblock import generate_page
 
 def copy_dir(source_dir, target_dir):
     if os.path.exists(source_dir) and os.path.exists(target_dir):
@@ -20,10 +21,15 @@ def copy_dir(source_dir, target_dir):
 def main():
     source_dir = "static"
     target_dir = "public"
+    # TODO: Añadir: si existe
     # We clean up the directory so test can make sense
     shutil.rmtree(target_dir)
     os.mkdir(target_dir)
     print(f"Created folder: {target_dir}")
     copy_dir(source_dir, target_dir)
+    # Page generation
+    from_path = os.path.join("content", "index.md")
+    dest_path = os.path.join("public", "index.html")
+    generate_page(from_path, "template.html", dest_path)
 
 main()

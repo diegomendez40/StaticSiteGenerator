@@ -1,3 +1,4 @@
+import os
 from textnode import (
     text_to_textnodes,
     textnode_to_html_node
@@ -42,6 +43,42 @@ def create_mdblock(block):
             return MDList(block)
         case _:
             return MDFlatBlock(block)
+
+
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        if is_heading(block):
+            if get_head_level(block) == 1:
+                return remove_md_heading_hashes(block)
+    return ""
+
+
+def generate_page(from_path, template_path, dest_path):
+        # 1. "Path does not exist" exceptions
+    if not (os.path.exists(from_path)):
+        raise Exception("Origin path does not exist")
+    if not os.path.exists(template_path):
+        raise Exception("Template path does not exist")
+        # 2. HTML generation
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    with open(from_path, 'r') as origin_file:
+        markdown = origin_file.read()
+    # os.close(origin_file)
+    with open(template_path, 'r') as template_file:
+        html_template = template_file.read()
+    # os.close(template_file)
+    title = extract_title(markdown)
+    generated_html = html_template.replace("{{ Title }}", title)
+    content = markdown_to_html_node(markdown).to_html()
+    generated_html = generated_html.replace("{{ Content }}", content)
+        # 3. Generated page gets written
+    target_dir = os.path.dirname(dest_path)
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+    with open(dest_path, 'w') as generated_file:
+        generated_file.write(generated_html)
+    # os.close(generated_file)
 
 
 def get_head_level(block):
