@@ -64,10 +64,8 @@ def generate_page(from_path, template_path, dest_path):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     with open(from_path, 'r') as origin_file:
         markdown = origin_file.read()
-    # os.close(origin_file)
     with open(template_path, 'r') as template_file:
         html_template = template_file.read()
-    # os.close(template_file)
     title = extract_title(markdown)
     generated_html = html_template.replace("{{ Title }}", title)
     content = markdown_to_html_node(markdown).to_html()
@@ -75,10 +73,27 @@ def generate_page(from_path, template_path, dest_path):
         # 3. Generated page gets written
     target_dir = os.path.dirname(dest_path)
     if not os.path.exists(target_dir):
+        print(f"Creating directory: {target_dir}")
         os.makedirs(target_dir)
     with open(dest_path, 'w') as generated_file:
         generated_file.write(generated_html)
-    # os.close(generated_file)
+
+
+def generate_pages_recursive(source_dir, template_path, target_dir):
+    if os.path.exists(source_dir) and os.path.exists(target_dir):
+        for entry in os.listdir(source_dir):
+            new_source = os.path.join(source_dir, entry)
+            if os.path.isfile(new_source) and entry.endswith(".md"):
+                html_filename = entry.replace(".md", ".html")
+                new_target = os.path.join(target_dir, html_filename)
+                generate_page(new_source, template_path, new_target)
+            else:
+                new_target = os.path.join(target_dir, entry)
+                os.mkdir(new_target)
+                generate_pages_recursive(new_source, template_path, new_target)       
+                print(f"Copying file: {new_source}")
+    else:
+        raise Exception('Directory does not exist')
 
 
 def get_head_level(block):

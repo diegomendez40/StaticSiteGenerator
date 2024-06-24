@@ -1,7 +1,7 @@
 import os
 import shutil
 from textnode import TextNode
-from mdblock import generate_page
+from mdblock import generate_pages_recursive
 
 def copy_dir(source_dir, target_dir):
     if os.path.exists(source_dir) and os.path.exists(target_dir):
@@ -27,9 +27,7 @@ def main():
     os.mkdir(target_dir)
     print(f"Created folder: {target_dir}")
     copy_dir(source_dir, target_dir)
-    # Page generation
-    from_path = os.path.join("content", "index.md")
-    dest_path = os.path.join("public", "index.html")
-    generate_page(from_path, "template.html", dest_path)
+    # Recursive generation of html pages
+    generate_pages_recursive("content", "template.html", "public")
 
 main()
